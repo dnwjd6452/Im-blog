@@ -20,7 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     #path('', include('djangotest.urls')),
     path('', include('im_blog.urls')),
-    path('portfolio/', portfolio.views.portfolio, name='portfolio'),
-
     
 ]
