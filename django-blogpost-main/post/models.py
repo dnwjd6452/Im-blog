@@ -3,16 +3,13 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
 from PIL import Image
-
-def post_image_path(instance, filename): 
-    return f'posts/{instance.content}/{instance.content}.jpeg'
+from django.conf import settings
 
 class Post(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
     date_posted = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to=post_image_path, blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -34,3 +31,11 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.content
+
+
+class Photo(models.Model):
+    image = models.ImageField(upload_to='blog/media/profile_pics', blank=True, null=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  
+    title = models.CharField(max_length=255)
+    date_posted = models.DateTimeField(auto_now_add=True) 
+
