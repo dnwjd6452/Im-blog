@@ -6,13 +6,14 @@ from django.views.generic import (
     DetailView,
     CreateView,
     UpdateView,
-    DeleteView
-    
+    DeleteView,
+    TemplateView
 )
-from .models import Post, Comment
-from users.forms import ProfileUpdateForm
+from .models import Post, Comment, Photo
+from users.forms import ProfileUpdateForm, UserRegisterForm, UserUpdateForm
 from django.utils import timezone
-from .forms import CommentForm
+from .forms import CommentForm, UploadForm
+from django.contrib.auth.decorators import login_required
 
 def home(request):
     context = {
@@ -46,7 +47,7 @@ class PostDetailView(DetailView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ['title', 'content', 'image']
+    fields = ['title', 'content']
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -55,7 +56,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ['title', 'content', 'image']
+    fields = ['title', 'content']
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -88,7 +89,7 @@ def PostCommentView(request, pk):
             comment.save()
             context = {
         'posts': Post.objects.all()
-    }
+        }
             return render(request, 'post/home.html', context)
     else:
         form = CommentForm()
@@ -97,3 +98,29 @@ def PostCommentView(request, pk):
 def about(request):
     return render(request, 'post/about.html', {'title': 'About'})
 
+@login_required
+def upload(request, pk):
+
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == "POST":
+        form = UploadForm(request.POST, request.FILES) # 대용량인 이미지를 처리해야 하므로 두 매개변수를 넘겨줘야함.
+        if form.is_valid():
+            photo = form.save(commit=False) # photo객체를 가져오긴 하나 DB에 아직 저장하진 않음
+            photo.author = request.user      # request.user는 로그인한 사용자
+            form.save()
+            context = {
+                'posts': Post.objects.all()
+        }
+            return render(request, 'post/home.html', context)
+    else:
+        form = UploadForm()
+    return render(request, 'post/upload.html', {'form': form})
+
+class IndexView(ListView):     
+    template_name = 'post/post_detail.html'
+     # model = Photo 이렇게 해주면 사용자를 안가리고 모든 photo객체가 넘어가게 되므로 아래와 같이 쿼리를 지정해줌.
+    context_object_name = 'user_post_detail' # 템플릿에 전달되는 이름
+
+    def get_queryset(self):
+        user = self.request.user    # 로그인되어있는 사용자
+        return user.photo_set.all().order_by('-pub_date')
