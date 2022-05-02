@@ -1,3 +1,3 @@
-# My portfolio blog
+# django블로그
 
-:stars:포트폴리오 웹사이트:stars:
+:stars:django블로그:stars:
