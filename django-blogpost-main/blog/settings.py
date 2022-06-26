@@ -44,8 +44,8 @@ AWS_SECRET_ACCESS_KEY = 'my_secret_code'
 AWS_STORAGE_BUCKET_NAME = "im-s3-1"
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = ''
+STATICFILES_STORAGE = ''
 AWS_S3_REGION_NAME = "ap-northeast-2"
 
 # SECURITY WARNING: don't run with debug turned on in production!
